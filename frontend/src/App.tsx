@@ -16,14 +16,28 @@ export default function App() {
   const [notice, setNotice] = useState(REQUEST_MESSAGES.overviewFallback);
   const [showAnnouncementCenter, setShowAnnouncementCenter] = useState(false);
 
+  const loadOverview = async () => {
+    try {
+      const payload = await fetchOverview();
+      setOverview(payload);
+      setNotice("后端服务已联通，当前展示实时接口数据。");
+    } catch {
+      setNotice(REQUEST_MESSAGES.overviewFallback);
+    }
+  };
+
   useEffect(() => {
-    fetchOverview()
-      .then((payload) => {
-        setOverview(payload);
-        setNotice("后端服务已联通，当前展示实时接口数据。");
-      })
-      .catch(() => setNotice(REQUEST_MESSAGES.overviewFallback));
+    loadOverview();
   }, []);
+
+  const handleAnnouncementDataChange = () => {
+    loadOverview();
+  };
+
+  const handleCloseAnnouncementCenter = () => {
+    setShowAnnouncementCenter(false);
+    loadOverview();
+  };
 
   if (showAnnouncementCenter) {
     return (
@@ -34,7 +48,7 @@ export default function App() {
             <h1 className="brand-title">{APP_NAME}</h1>
           </div>
           <button
-            onClick={() => setShowAnnouncementCenter(false)}
+            onClick={handleCloseAnnouncementCenter}
             className="rounded-md bg-accent px-4 py-2 font-bold text-white hover:bg-accent/90"
           >
             返回首页
@@ -43,7 +57,8 @@ export default function App() {
         <section className="workspace">
           <AnnouncementCenter
             initialAnnouncements={overview.announcements}
-            onClose={() => setShowAnnouncementCenter(false)}
+            onClose={handleCloseAnnouncementCenter}
+            onDataChange={handleAnnouncementDataChange}
           />
         </section>
       </main>

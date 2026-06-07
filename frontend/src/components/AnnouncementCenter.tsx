@@ -19,9 +19,10 @@ const emptyForm: CreateAnnouncementRequest = {
 interface AnnouncementCenterProps {
   initialAnnouncements?: Announcement[];
   onClose?: () => void;
+  onDataChange?: () => void;
 }
 
-export function AnnouncementCenter({ initialAnnouncements = [], onClose }: AnnouncementCenterProps) {
+export function AnnouncementCenter({ initialAnnouncements = [], onClose, onDataChange }: AnnouncementCenterProps) {
   const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -70,6 +71,7 @@ export function AnnouncementCenter({ initialAnnouncements = [], onClose }: Annou
         setAnnouncements((prev) => [newAnnouncement, ...prev]);
       }
 
+      onDataChange?.();
       setShowForm(false);
       setEditingId(null);
       setFormData(emptyForm);
@@ -100,6 +102,7 @@ export function AnnouncementCenter({ initialAnnouncements = [], onClose }: Annou
       setLoading(true);
       await deleteAnnouncement(id);
       setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+      onDataChange?.();
       setError(null);
     } catch (err) {
       setError("删除失败，请稍后重试");
@@ -117,6 +120,7 @@ export function AnnouncementCenter({ initialAnnouncements = [], onClose }: Annou
       setAnnouncements((prev) =>
         prev.map((a) => (a.id === announcement.id ? updated : a))
       );
+      onDataChange?.();
       setError(null);
     } catch (err) {
       setError("操作失败，请稍后重试");
