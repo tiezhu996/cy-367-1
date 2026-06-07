@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
-import { fetchOverview } from "./api/client";
+import { useEffect, useState, useCallback } from "react";
+import {
+  fetchOverview,
+  fetchCarouselAnnouncements,
+  fetchRecentAnnouncements,
+} from "./api/client";
 import { APP_CODE, APP_NAME } from "./constants/app";
 import { REQUEST_MESSAGES } from "./constants/messages";
 import { createFallbackOverview } from "./state/dashboard";
-import type { OverviewResponse } from "./types";
+import { localAnnouncements } from "./data/workbench";
+import type { OverviewResponse, Announcement } from "./types";
 import { FeatureStrip } from "./components/FeatureStrip";
 import { MetricGrid } from "./components/MetricGrid";
 import { OperationsTable } from "./components/OperationsTable";
@@ -13,6 +18,8 @@ import { AnnouncementCenter } from "./components/AnnouncementCenter";
 
 export default function App() {
   const [overview, setOverview] = useState<OverviewResponse>(createFallbackOverview());
+  const [carouselAnnouncements, setCarouselAnnouncements] = useState<Announcement[]>(localAnnouncements);
+  const [sidebarAnnouncements, setSidebarAnnouncements] = useState<Announcement[]>(localAnnouncements);
   const [notice, setNotice] = useState(REQUEST_MESSAGES.overviewFallback);
   const [showAnnouncementCenter, setShowAnnouncementCenter] = useState(false);
 
@@ -26,17 +33,47 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    loadOverview();
+  const loadCarouselAnnouncements = useCallback(async () => {
+    try {
+      const data = await fetchCarouselAnnouncements();
+      if (data.length > 0) {
+        setCarouselAnnouncements(data);
+      }
+    } catch {
+      setCarouselAnnouncements(localAnnouncements);
+    }
   }, []);
 
+  const loadSidebarAnnouncements = useCallback(async () => {
+    try {
+      const data = await fetchRecentAnnouncements(3);
+      if (data.length > 0) {
+        setSidebarAnnouncements(data);
+      }
+    } catch {
+      setSidebarAnnouncements(localAnnouncements);
+    }
+  }, []);
+
+  const loadAllData = useCallback(async () => {
+    await Promise.all([
+      loadOverview(),
+      loadCarouselAnnouncements(),
+      loadSidebarAnnouncements(),
+    ]);
+  }, [loadCarouselAnnouncements, loadSidebarAnnouncements]);
+
+  useEffect(() => {
+    loadAllData();
+  }, [loadAllData]);
+
   const handleAnnouncementDataChange = () => {
-    loadOverview();
+    loadAllData();
   };
 
   const handleCloseAnnouncementCenter = () => {
     setShowAnnouncementCenter(false);
-    loadOverview();
+    loadAllData();
   };
 
   if (showAnnouncementCenter) {
@@ -56,7 +93,7 @@ export default function App() {
         </header>
         <section className="workspace">
           <AnnouncementCenter
-            initialAnnouncements={overview.announcements}
+            initialAnnouncements={carouselAnnouncements}
             onClose={handleCloseAnnouncementCenter}
             onDataChange={handleAnnouncementDataChange}
           />
@@ -83,7 +120,7 @@ export default function App() {
         </div>
       </header>
       <section className="workspace">
-        <AnnouncementCarousel announcements={overview.announcements} />
+        <AnnouncementCarousel announcements={carouselAnnouncements} />
 
         <div className="lead-grid mt-6">
           <article className="hero-panel">
@@ -94,7 +131,7 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <MetricGrid items={overview.kpis} />
             <AnnouncementSidebar
-              announcements={overview.announcements}
+              announcements={sidebarAnnouncements}
               limit={3}
               onViewAll={() => setShowAnnouncementCenter(true)}
             />
