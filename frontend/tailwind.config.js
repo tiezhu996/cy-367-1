@@ -7,6 +7,8 @@ export default {
         paper: "#fbf7ef",
         accent: "#a8622b",
         ember: "#39745e",
+        emerald: "#059669",
+        red: "#dc2626",
       },
     },
   },

@@ -22,6 +22,38 @@ export interface OperationRecord {
   priority: string;
 }
 
+export interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  isPinned: boolean;
+  validFrom: string;
+  validTo: string;
+  status: "draft" | "published" | "archived";
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAnnouncementRequest {
+  title: string;
+  content: string;
+  isPinned?: boolean;
+  validFrom: string;
+  validTo: string;
+  status?: "draft" | "published" | "archived";
+  createdBy?: string;
+}
+
+export interface UpdateAnnouncementRequest {
+  title?: string;
+  content?: string;
+  isPinned?: boolean;
+  validFrom?: string;
+  validTo?: string;
+  status?: "draft" | "published" | "archived";
+}
+
 export interface OverviewResponse {
   appName: string;
   appCode: string;
@@ -29,4 +61,5 @@ export interface OverviewResponse {
   features: FeatureItem[];
   kpis: KpiItem[];
   records: OperationRecord[];
+  announcements: Announcement[];
 }

@@ -1,4 +1,67 @@
-import type { FeatureItem, KpiItem, OperationRecord } from "../types";
+import type { FeatureItem, KpiItem, OperationRecord, Announcement } from "../types";
+
+const today = new Date().toISOString().split("T")[0];
+const addDays = (dateStr: string, days: number) => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split("T")[0];
+};
+const subDays = (dateStr: string, days: number) => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split("T")[0];
+};
+
+export const localAnnouncements: Announcement[] = [
+  {
+    id: 1,
+    title: "系统维护通知",
+    content: "本周六凌晨2:00-4:00将进行系统维护，届时座位预约功能将暂停使用，请提前做好安排。",
+    isPinned: true,
+    validFrom: today,
+    validTo: addDays(today, 7),
+    status: "published",
+    createdBy: "admin",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    title: "端午节日安排",
+    content: "端午节期间自习室正常开放，开放时间调整为8:00-22:00，祝大家节日快乐！",
+    isPinned: false,
+    validFrom: subDays(today, 2),
+    validTo: addDays(today, 5),
+    status: "published",
+    createdBy: "admin",
+    createdAt: new Date(subDays(today, 2)).toISOString(),
+    updatedAt: new Date(subDays(today, 2)).toISOString(),
+  },
+  {
+    id: 3,
+    title: "静音区新规实施",
+    content: "为营造更好的学习环境，自即日起静音区禁止食用任何食物，违规者将被扣除积分。",
+    isPinned: true,
+    validFrom: subDays(today, 1),
+    validTo: addDays(today, 30),
+    status: "published",
+    createdBy: "admin",
+    createdAt: new Date(subDays(today, 1)).toISOString(),
+    updatedAt: new Date(subDays(today, 1)).toISOString(),
+  },
+  {
+    id: 4,
+    title: "新用户注册优惠",
+    content: "新用户注册即送3小时免费学习时长，邀请好友再得5小时，活动截至本月底。",
+    isPinned: false,
+    validFrom: today,
+    validTo: addDays(today, 14),
+    status: "published",
+    createdBy: "admin",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
 
 export const localFeatures: FeatureItem[] = [
   {

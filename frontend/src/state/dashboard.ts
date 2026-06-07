@@ -1,4 +1,4 @@
-import { localFeatures, localKpis, operationRecords } from "../data/workbench";
+import { localFeatures, localKpis, operationRecords, localAnnouncements } from "../data/workbench";
 import type { OverviewResponse } from "../types";
 import { APP_CODE, APP_NAME } from "../constants/app";
 
@@ -10,5 +10,6 @@ export function createFallbackOverview(): OverviewResponse {
     features: localFeatures,
     kpis: localKpis,
     records: operationRecords,
+    announcements: localAnnouncements,
   };
 }
